@@ -37,20 +37,31 @@ class Person(object):
         return people_list
 
 
-def get_josephus_circle(people_list, interval, start_person_id):
-    assert type(people_list)==list  and type(interval)==int and type(start_person_id)==int
-    assert 0 < start_person_id <= len(people_list)
-    circle = []
-    person_index = [ person.id for person in people_list ].index(start_person_id)  # 根据开始报数人的编号找开始报数人的位置索引    
-    while(len(people_list)):
-        person_index = (person_index+interval-1) % len(people_list)
-        circle.append(people_list.pop(person_index))
-    return circle 
+class JosephusCircle():
+    def  __init__(self,people_list,interval,start_person_id):
+        assert type(people_list)==list  and type(interval)==int and type(start_person_id)==int
+        assert 0 < start_person_id <= len(people_list)
+        self.people_list = people_list
+        self.interval = interval
+        self.start_person_id = start_person_id
+        self.start_pos = [ person.id for person in self.people_list ].index(self.start_person_id)
+
+    def __iter__(self):
+        return self 
+
+    def __next__(self):
+        if len(self.people_list)>0:
+            out_pos = (self.start_pos+self.interval-1) % len(self.people_list)
+            out_person = self.people_list.pop(out_pos)
+            self.start_pos = out_pos
+            return out_person
+        else:
+            raise StopIteration
 
 
 if __name__ == '__main__':
     people_list = Person.get_people_list(11)
-    josephus_circle = get_josephus_circle(people_list, 3, 4)
+    josephus_circle = JosephusCircle(people_list, 3, 4)
 
     for person in josephus_circle:
         print(person.__str__())
